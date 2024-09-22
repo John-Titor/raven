@@ -7,6 +7,7 @@
 #include "hw/midi.h"
 #include "hw/i2c.h"
 #include "hw/rtc.h"
+#include "hw/flash.h"
 #include "monitor.h"
 #include "config.h"
 #include "atari.h"
@@ -23,8 +24,8 @@ uint32_t kheapPtr;
 uint32_t ksimm[4];
 
 extern uint8_t __text_end;
-extern uint8_t __data_start;
-extern uint8_t __data_end;
+extern uint8_t __copy_start;
+extern uint8_t __copy_end;
 extern uint8_t __bss_start;
 extern uint8_t __bss_end;
 
@@ -52,7 +53,7 @@ bool sys_Init()
     // identify rom
     uint32_t id_simm[4];
     id_simm[3] = IOL(IOL(PADDR_SIMM3, 0), 4);
-    fmt("ROM:  %l\n", id_simm[3]);
+    fmt("MON:  %l\n", id_simm[3]);
 
 	// identify ram
     for (int i=0; i<3; i++) {
@@ -78,7 +79,10 @@ bool sys_Init()
     // clear bios bss area & copy data
     puts("InitBss");
     memset(&__bss_start, 0, &__bss_end - &__bss_start);
-    memcpy(&__data_start, &__text_end, &__data_end - &__data_start);
+    memcpy(&__copy_start, &__text_end, &__copy_end - &__copy_start);
+
+    // identify flash
+    fmt("ROM:  %s\n", flash_identify());
 
     // we can use bss section from this point onward
     ksimm[0] = id_simm[0];

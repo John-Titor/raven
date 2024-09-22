@@ -87,6 +87,11 @@ void        mmu_Invalid(uint32_t log, uint32_t size);
 void        mmu_Flush();
 
 //-------------------------------------------------------
+// cache
+//-------------------------------------------------------
+static inline void cache_InvalidateLine(uint32_t phys) { __asm__ volatile ("cinvl %%dc,(%0)" : : "a"(phys) : "memory"); }
+
+//-------------------------------------------------------
 // vbr proxy
 //-------------------------------------------------------
 bool        vbr_Init();

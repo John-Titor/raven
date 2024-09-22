@@ -19,11 +19,18 @@ SECTIONS
 {
 	.text :
 	{
+		__flash_start = .;
 		KEEP(*(.vectors)) 			/* early ROM vector table */
 		*(.text* .rodata*)			/* text and text-like things */
 		. = ALIGN(4);
 		__text_end = .;
 	} >ROM
+
+	.ramtext :						/* RAM-resident flash functions */
+	{
+		__copy_start = .;
+		*(.ramtext)
+	} >RAM AT>ROM
 
 	.data :
 	{
@@ -31,6 +38,7 @@ SECTIONS
 		*(.data*)					/* non-constant initialised data */
 		. = ALIGN(4);
 		__data_end = .;
+		__copy_end = .;
 	} >RAM AT>ROM
 
 	.bss :
